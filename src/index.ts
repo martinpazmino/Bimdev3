@@ -1,6 +1,8 @@
 import * as THREE from "three"
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min"
-import {OrbitControls} from "three/examples/jsm/controls/OrbitControls"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
+import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader"
 import { IProject, ProjectStatus, UserRole } from "./classes/Project"
 import { ProjectsManager } from "./classes/ProjectsManager"
 
@@ -103,7 +105,7 @@ const directionalLight = new THREE.DirectionalLight()
 const ambientLight = new THREE.AmbientLight()
 ambientLight.intensity = 0.4
 
-scene.add(cube, directionalLight, ambientLight)
+scene.add(directionalLight, ambientLight)
 
 const cameraControls = new OrbitControls(camera, viewerContainer)
 
@@ -131,3 +133,14 @@ cubeControls.add(cube.position, "y", -10, 10, 1)
 cubeControls.add(cube.position, "z", -10, 10, 1)
 cubeControls.add(cube, "visible")
 cubeControls.addColor(cube.material, "color")
+
+const objLoader = new OBJLoader()
+const mtlLoader = new MTLLoader()
+
+mtlLoader.load("../assets/Gear/Gear1.mtl", (materials) => {
+  materials.preload()
+  objLoader.setMaterials(materials)
+  objLoader.load("../assets/Gear/Gear1.obj", (mesh) => {
+    scene.add(mesh)
+  })
+})
