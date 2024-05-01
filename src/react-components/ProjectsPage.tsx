@@ -1,16 +1,52 @@
 import * as React from 'react';
+import { IProject, ProjectStatus, UserRole } from '../classes/Project';
+import { ProjectsManager } from '../classes/ProjectsManager';
 
 export function ProjectsPage() {
-  // const tipStyle: React.CSSProperties = {
-  //   color: "gray",
-  //   fontSize: "var(--font-sm)",
-  //   marginTop: "5px",
-  //   fontStyle: "italic"
-  // }
+  const projectsManager = new ProjectsManager();
+
+  const onNewProjectClick = () => {
+    const modal = document.getElementById("new-project-modal")
+    if (!(modal && modal instanceof HTMLDialogElement)) {return}
+    modal.showModal()
+  }
+
+  const onFormSubmit = (e: React.FormEvent) => {
+    const projectForm = document.getElementById("new-project-form")
+    if (!(projectForm && projectForm instanceof HTMLFormElement)) {return}
+    e.preventDefault()
+    const formData = new FormData(projectForm)
+    const projectData: IProject = {
+      name: formData.get("name") as string,
+      description: formData.get("description") as string,
+      status: formData.get("status") as ProjectStatus,
+      userRole: formData.get("userRole") as UserRole,
+      finishDate: new Date(formData.get("finishDate") as string)
+    }
+    try {
+      const project = projectsManager.newProject(projectData)
+      console.log(project)
+      projectForm.reset()
+      const modal = document.getElementById("new-project-modal")
+      if (!(modal && modal instanceof HTMLDialogElement)) {return}
+      modal.close()
+    } catch (err) {
+      alert(err)
+    }
+  }
+
+  const onExportProject = () => {
+    projectsManager.exportToJSON()
+  }
+
+  const onImportProject = () => {
+    projectsManager.importFromJSON()
+  }
+
   return (
     <div className="page" id="projects-page" style={{ display: "flex" }}>
       <dialog id="new-project-modal">
-        <form id="new-project-form">
+        <form onSubmit={(e) => onFormSubmit(e)} id="new-project-form">
           <h2>New Project</h2>
           <div className="input-list">
             <div className="form-field-container">
@@ -96,16 +132,18 @@ export function ProjectsPage() {
           <span
             id="import-projects-btn"
             className="material-icons-round action-icon"
+            onClick={onImportProject}
           >
             file_upload
           </span>
           <span
             id="export-projects-btn"
             className="material-icons-round action-icon"
+            onClick={onExportProject}
           >
             file_download
           </span>
-          <button id="new-project-btn">
+          <button onClick={onNewProjectClick} id="new-project-btn">
             <span className="material-icons-round">add</span>New Project
           </button>
         </div>
