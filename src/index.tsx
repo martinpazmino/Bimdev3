@@ -8,11 +8,15 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js"
 import { IProject, ProjectStatus, UserRole } from "./classes/Project"
 import { ProjectsManager } from "./classes/ProjectsManager"
+import { ProjectsPage } from "./react-components/ProjectsPage"
 
 const rootElement = document.getElementById("app") as HTMLDivElement
 const appRoot = ReactDOM.createRoot(rootElement)
 appRoot.render(
-  <Sidebar />
+  <>
+    <Sidebar />
+    <ProjectsPage />
+  </>
 )
 
 function showModal(id: string) {
