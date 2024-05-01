@@ -8,7 +8,7 @@ export function ProjectsPage() {
   //   fontStyle: "italic"
   // }
   return (
-    <div className="page" id="projects-page" style={{ display: "none" }}>
+    <div className="page" id="projects-page" style={{ display: "flex" }}>
       <dialog id="new-project-modal">
         <form id="new-project-form">
           <h2>New Project</h2>
