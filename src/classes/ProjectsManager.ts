@@ -2,6 +2,8 @@ import { IProject, Project } from "./Project"
 
 export class ProjectsManager {
   list: Project[] = []
+  OnProjectCreated = (project: Project) => {}
+  OnProjectDeleted = () => {}
 
   constructor() {
     const project = this.newProject({
@@ -22,7 +24,8 @@ export class ProjectsManager {
       throw new Error(`A project with the name "${data.name}" already exists`)
     }
     const project = new Project(data)
-    this.list.push(project)	
+    this.list.push(project)
+    this.OnProjectCreated(project)
     return project
   }
 
@@ -40,6 +43,7 @@ export class ProjectsManager {
       return project.id !== id
     })
     this.list = remaining
+    this.OnProjectDeleted()
   }
   
   exportToJSON(fileName: string = "projects") {
