@@ -53,6 +53,11 @@ h5 {
   font-size: var(--font-lg)
 }
 
+a {
+  text-decoration: none;
+  color: white;
+}
+
 button {
   padding: 8px 15px;
   cursor: pointer;
@@ -106,7 +111,6 @@ button:hover {
   display: flex;
   align-items: center;
   column-gap: 10px;
-  color: white;
 }
 
 #nav-buttons li:hover {

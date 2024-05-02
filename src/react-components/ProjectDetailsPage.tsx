@@ -1,6 +1,15 @@
 import * as React from 'react';
+import * as Router from 'react-router-dom';
+import { ProjectsManager } from '../classes/ProjectsManager';
 
-export function ProjectDetailsPage() {
+interface Props {
+  projectsManager: ProjectsManager
+}
+
+export function ProjectDetailsPage(props: Props) {
+  const routeParams = Router.useParams<{id: string}>()
+  console.log(`Project ID: ${routeParams.id}`);
+  const project = props.projectsManager.getProject()
   return (
     <div className="page" id="project-details">
       <header>
