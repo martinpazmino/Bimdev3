@@ -1,19 +1,26 @@
 import * as THREE from "three"
 import * as React from "react"
 import * as ReactDOM from "react-dom/client"
+import * as Router from "react-router-dom"
 import { Sidebar } from "./react-components/Sidebar"
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
 import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js"
 import { ProjectsPage } from "./react-components/ProjectsPage"
+import { ProjectDetailsPage } from "./react-components/ProjectDetailsPage"
 
 const rootElement = document.getElementById("app") as HTMLDivElement
 const appRoot = ReactDOM.createRoot(rootElement)
 appRoot.render(
   <>
-    <Sidebar />
-    <ProjectsPage />
+    <Router.BrowserRouter>
+      <Sidebar />
+      <Router.Routes>
+        <Router.Route path="/" element={<ProjectsPage />}></Router.Route>
+        <Router.Route path="/project" element={<ProjectDetailsPage />}></Router.Route>
+      </Router.Routes>
+    </Router.BrowserRouter>
   </>
 )
 
