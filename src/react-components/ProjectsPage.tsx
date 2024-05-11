@@ -1,9 +1,9 @@
-import * as React from 'react';
-import * as Router from 'react-router-dom';
-import { IProject, Project, ProjectStatus, UserRole } from '../classes/Project';
-import { ProjectCard } from './ProjectCard';
-import { SearchBox } from './SearchBox';
-import { ProjectsManager } from '../classes/ProjectsManager';
+import * as React from "react";
+import * as Router from "react-router-dom";
+import { IProject, Project, ProjectStatus, UserRole } from "../classes/Project";
+import { ProjectCard } from "./ProjectCard";
+import { SearchBox } from "./SearchBox";
+import { ProjectsManager } from "../classes/ProjectsManager";
 
 interface Props {
   projectsManager: ProjectsManager

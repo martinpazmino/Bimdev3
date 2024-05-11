@@ -1,7 +1,7 @@
-import * as React from 'react';
-import * as Router from 'react-router-dom';
-import { ProjectsManager } from '../classes/ProjectsManager';
-import { ThreeViewer } from './ThreeViewer';
+import * as React from "react";
+import * as Router from "react-router-dom";
+import { ProjectsManager } from "../classes/ProjectsManager";
+import { ThreeViewer } from "./ThreeViewer";
 
 interface Props {
   projectsManager: ProjectsManager
