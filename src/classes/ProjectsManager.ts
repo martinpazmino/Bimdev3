@@ -5,16 +5,6 @@ export class ProjectsManager {
   OnProjectCreated = (project: Project) => {}
   OnProjectDeleted = () => {}
 
-  constructor() {
-    const project = this.newProject({
-      name: "Default Project",
-      description: "This is just a default app project",
-      status: "pending",
-      userRole: "architect",
-      finishDate: new Date()
-    })
-  }
-
   filterProjects(value: string) {
     const filteredProjects = this.list.filter((project) => {
       return project.name.includes(value)
@@ -22,7 +12,7 @@ export class ProjectsManager {
     return filteredProjects
   }
 
-  newProject(data: IProject) {
+  newProject(data: IProject, id?: string) {
     const projectNames = this.list.map((project) => {
       return project.name
     })
@@ -30,7 +20,7 @@ export class ProjectsManager {
     if (nameInUse) {
       throw new Error(`A project with the name "${data.name}" already exists`)
     }
-    const project = new Project(data)
+    const project = new Project(data, id)
     this.list.push(project)
     this.OnProjectCreated(project)
     return project
