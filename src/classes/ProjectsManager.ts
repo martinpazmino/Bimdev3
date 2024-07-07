@@ -3,7 +3,7 @@ import { IProject, Project } from "./Project"
 export class ProjectsManager {
   list: Project[] = []
   OnProjectCreated = (project: Project) => {}
-  OnProjectDeleted = () => {}
+  OnProjectDeleted = (id: string) => {}
 
   filterProjects(value: string) {
     const filteredProjects = this.list.filter((project) => {
@@ -40,7 +40,7 @@ export class ProjectsManager {
       return project.id !== id
     })
     this.list = remaining
-    this.OnProjectDeleted()
+    this.OnProjectDeleted(id)
   }
   
   exportToJSON(fileName: string = "projects") {
