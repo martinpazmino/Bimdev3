@@ -280,3 +280,10 @@ input:focus, textarea:focus, select:focus {
 .todo-item:hover {
   background-color: var(--primary);
 }
+
+/* ToDo card flexible theme */
+.todo-card {
+  background-color: var(--background-100);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}

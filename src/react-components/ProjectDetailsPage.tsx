@@ -3,6 +3,7 @@ import * as Router from "react-router-dom";
 import { ProjectsManager } from "../classes/ProjectsManager";
 import { ThreeViewer } from "./ThreeViewer";
 import { deleteDocument } from "../firebase";
+import { ProjectTasksList } from "./ProjectTasksList";
 
 interface Props {
   projectsManager: ProjectsManager
@@ -19,6 +20,8 @@ export function ProjectDetailsPage(props: Props) {
     await deleteDocument("/projects", id)
     navigateTo("/")
   }
+  const [showCreateToDo, setShowCreateToDo] = React.useState(false)
+  const [toDoQuery, setToDoQuery] = React.useState("")
   return (
     <div className="page" id="project-details">
       <header>
@@ -138,47 +141,20 @@ export function ProjectDetailsPage(props: Props) {
                   <input
                     type="text"
                     placeholder="Search To-Do's by name"
+                    value={toDoQuery}
+                    onChange={(e) => setToDoQuery(e.target.value)}
                     style={{ width: "100%" }}
                   />
                 </div>
-                <span className="material-icons-round">add</span>
+                <span className="material-icons-round" onClick={() => setShowCreateToDo(true)} style={{cursor: "pointer"}}>add</span>
               </div>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                padding: "10px 30px",
-                rowGap: 20
-              }}
-            >
-              <div className="todo-item">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center"
-                  }}
-                >
-                  <div
-                    style={{ display: "flex", columnGap: 15, alignItems: "center" }}
-                  >
-                    <span
-                      className="material-icons-round"
-                      style={{
-                        padding: 10,
-                        backgroundColor: "#686868",
-                        borderRadius: 10
-                      }}
-                    >
-                      construction
-                    </span>
-                    <p>Make anything here as you want, even something longer.</p>
-                  </div>
-                  <p style={{ marginLeft: 10 }}>Fri, 20 sep</p>
-                </div>
-              </div>
-            </div>
+            <ProjectTasksList
+              projectId={project.id}
+              queryText={toDoQuery}
+              showCreate={showCreateToDo}
+              onRequestCloseCreate={() => setShowCreateToDo(false)}
+            />
           </div>
         </div>
         <ThreeViewer />
