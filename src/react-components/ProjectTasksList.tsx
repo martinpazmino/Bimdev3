@@ -1,68 +1,53 @@
 import * as React from "react"
-import * as Firestore from "firebase/firestore"
-import { firestoreDB } from "../firebase"
+import { ProjectsManager } from "../classes/ProjectsManager"
 import { ToDoCard } from "./ToDoCard"
-import { ToDo as ToDoModel } from "../classes/ToDo"
+import { ToDo as ToDoModel, IToDo } from "../classes/ToDo"
+import { v4 as uuidv4 } from "uuid"
 
 interface Props {
   projectId: string
+  projectsManager: ProjectsManager
   queryText?: string
   showCreate?: boolean
   onRequestCloseCreate?: () => void
 }
 
 export function ProjectTasksList(props: Props) {
-  const [todos, setTodos] = React.useState<ToDoModel[]>([])
-  const [loading, setLoading] = React.useState<boolean>(true)
+  const getProjectTodos = (): ToDoModel[] => {
+    const project = props.projectsManager.getProject(props.projectId)
+    return (project?.todos ?? []).map((t) => new ToDoModel(t, (t as any).id ?? uuidv4()))
+  }
+
+  const [todos, setTodos] = React.useState<ToDoModel[]>(getProjectTodos)
   const [title, setTitle] = React.useState("")
   const [description, setDescription] = React.useState("")
   const [priority, setPriority] = React.useState<ToDoModel["priority"]>("Low")
   const [status, setStatus] = React.useState<ToDoModel["status"]>("Pending")
   const [progress, setProgress] = React.useState<number>(0)
 
+  const persistTodos = (updated: ToDoModel[]) => {
+    props.projectsManager.updateProject(props.projectId, { todos: updated as IToDo[] })
+    setTodos(updated)
+  }
+
+  const createToDo = (todo: Omit<ToDoModel, "id" | "createdAt">) => {
+    const newTodo = new ToDoModel({ ...todo, createdAt: new Date() }, uuidv4())
+    persistTodos([...todos, newTodo])
+  }
+
+  const updateToDo = (id: string, updates: Partial<ToDoModel>) => {
+    const updated = todos.map((t) => t.id === id ? { ...t, ...updates } as ToDoModel : t)
+    persistTodos(updated)
+  }
+
+  const deleteToDo = (id: string) => {
+    persistTodos(todos.filter((t) => t.id !== id))
+  }
+
+  // Re-sync when project data changes externally (e.g. after import)
   React.useEffect(() => {
-    setLoading(true)
-    const baseQuery = Firestore.query(
-      Firestore.collection(firestoreDB, "ToDo"),
-      Firestore.where("projectId", "==", props.projectId)
-    )
-    const unsubscribe = Firestore.onSnapshot(baseQuery, (snapshot) => {
-      const items: ToDoModel[] = snapshot.docs.map((doc) => {
-        const data = doc.data() as any
-        return {
-          id: doc.id,
-          title: data.title,
-          description: data.description,
-          priority: data.priority,
-          status: data.status,
-          projectId: data.projectId,
-          createdAt: data.createdAt,
-          progress: typeof data.progress === "number" ? data.progress : undefined
-        } as ToDoModel
-      })
-      setTodos(items)
-      setLoading(false)
-    })
-    return () => unsubscribe()
+    setTodos(getProjectTodos())
   }, [props.projectId])
-
-  const createToDo = async (todo: Omit<ToDoModel, "id" | "createdAt">) => {
-    const payload = {
-      ...todo,
-      createdAt: Firestore.serverTimestamp()
-    }
-    await Firestore.addDoc(Firestore.collection(firestoreDB, "ToDo"), payload)
-  }
-
-  const updateToDo = async (id: string, updates: Partial<ToDoModel>) => {
-    const ref = Firestore.doc(firestoreDB, `ToDo/${id}`)
-    await Firestore.updateDoc(ref, updates as any)
-  }
-
-  const deleteToDo = async (id: string) => {
-    const ref = Firestore.doc(firestoreDB, `ToDo/${id}`)
-    await Firestore.deleteDoc(ref)
-  }
 
   const filteredTodos = React.useMemo(() => {
     const q = (props.queryText ?? "").trim().toLowerCase()
@@ -75,8 +60,7 @@ export function ProjectTasksList(props: Props) {
   return (
     <div style={{ padding: "0 30px 20px 30px" }}>
       <div style={{ display: "flex", flexDirection: "column", rowGap: 12 }}>
-        {loading && <p>Loading tasks…</p>}
-        {!loading && filteredTodos.length === 0 && <p>No tasks yet.</p>}
+        {filteredTodos.length === 0 && <p>No tasks yet.</p>}
         {filteredTodos.map((t) => (
           <EditableToDoCard
             key={t.id}
@@ -88,9 +72,9 @@ export function ProjectTasksList(props: Props) {
       </div>
       {props.showCreate && (
         <form
-          onSubmit={async (e) => {
+          onSubmit={(e) => {
             e.preventDefault()
-            await createToDo({
+            createToDo({
               title,
               description,
               priority,
@@ -227,5 +211,3 @@ function EditableToDoCard(props: { todo: ToDoModel; onSave: (updates: Partial<To
     </form>
   )
 }
-
-

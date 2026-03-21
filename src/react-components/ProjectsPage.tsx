@@ -1,43 +1,22 @@
 import * as React from "react";
 import * as Router from "react-router-dom";
-import * as Firestore from "firebase/firestore";
-import { IProject, Project, ProjectStatus, UserRole } from "../classes/Project";
+import { IProject, Project } from "../classes/Project";
 import { ProjectCard } from "./ProjectCard";
 import { ProjectForm } from "./ProjectForm";
 import { SearchBox } from "./SearchBox";
 import { ProjectsManager } from "../classes/ProjectsManager";
-import { getCollection } from "../firebase";
 
 interface Props {
   projectsManager: ProjectsManager
 }
 
-const projectsCollection = getCollection<IProject>("projects")
-
 export function ProjectsPage(props: Props) {
 
   const [projects, setProjects] = React.useState<Project[]>(props.projectsManager.list)
-  props.projectsManager.OnProjectCreated = () => {setProjects([...props.projectsManager.list])}
 
-  const getFirestoreProjects = async () => {
-    const firebaseProjects = await Firestore.getDocs(projectsCollection)
-    for (const doc of firebaseProjects.docs) {
-      const data = doc.data()
-      const project: IProject = {
-        ...data,
-        finishDate: (data.finishDate as unknown as Firestore.Timestamp).toDate()
-      }
-      try {
-        props.projectsManager.newProject(project, doc.id)
-      } catch (error) {
-        
-      }
-    }
-  }
-
-  React.useEffect(() => {
-    getFirestoreProjects()
-  }, [])
+  props.projectsManager.OnProjectCreated = () => { setProjects([...props.projectsManager.list]) }
+  props.projectsManager.OnProjectDeleted = () => { setProjects([...props.projectsManager.list]) }
+  props.projectsManager.OnProjectUpdated = () => { setProjects([...props.projectsManager.list]) }
 
   const projectCards = projects.map((project) => {
     return (
@@ -46,10 +25,6 @@ export function ProjectsPage(props: Props) {
       </Router.Link>
     )
   })
-
-  React.useEffect(() => {
-    console.log("Projects state updated", projects)
-  }, [projects])
 
   const onNewProjectClick = () => {
     const modal = document.getElementById("new-project-modal")
@@ -61,8 +36,6 @@ export function ProjectsPage(props: Props) {
     try {
       if (result.action === "create") {
         props.projectsManager.newProject(result.data, result.id)
-      } else {
-        // For future: update local project state if editing from this page
       }
       const modal = document.getElementById("new-project-modal")
       if (!(modal && modal instanceof HTMLDialogElement)) {return}

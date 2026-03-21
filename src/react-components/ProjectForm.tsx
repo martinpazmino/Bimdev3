@@ -1,7 +1,6 @@
 import * as React from "react"
-import * as Firestore from "firebase/firestore"
 import { IProject, ProjectStatus, UserRole } from "../classes/Project"
-import { getCollection, updateDocument } from "../firebase"
+import { v4 as uuidv4 } from "uuid"
 
 interface SubmitResult {
   action: "create" | "update"
@@ -14,8 +13,6 @@ interface Props {
   onSubmit: (result: SubmitResult) => void
   onCancel?: () => void
 }
-
-const projectsCollection = getCollection<IProject>("projects")
 
 export function ProjectForm(props: Props) {
   const [name, setName] = React.useState<string>(props.project?.name ?? "")
@@ -31,13 +28,9 @@ export function ProjectForm(props: Props) {
     }
     return ""
   })
-  const [submitting, setSubmitting] = React.useState<boolean>(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (submitting) { return }
-    setSubmitting(true)
-
     const data: IProject = {
       name,
       description,
@@ -45,20 +38,9 @@ export function ProjectForm(props: Props) {
       status,
       finishDate: finishDate ? new Date(finishDate) : new Date()
     }
-
-    try {
-      if (props.project?.id) {
-        await updateDocument<IProject>("/projects", props.project.id, data)
-        props.onSubmit({ action: "update", id: props.project.id, data })
-      } else {
-        const ref = await Firestore.addDoc(projectsCollection, data)
-        props.onSubmit({ action: "create", id: ref.id, data })
-      }
-    } catch (error) {
-      alert(error)
-    } finally {
-      setSubmitting(false)
-    }
+    const id = props.project?.id ?? uuidv4()
+    const action: "create" | "update" = props.project?.id ? "update" : "create"
+    props.onSubmit({ action, id, data })
   }
 
   return (
@@ -75,6 +57,7 @@ export function ProjectForm(props: Props) {
             placeholder="What's the name of your project?"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
           <p
             style={{
@@ -138,13 +121,11 @@ export function ProjectForm(props: Props) {
           <button type="button" style={{ backgroundColor: "transparent" }} onClick={props.onCancel}>
             Cancel
           </button>
-          <button type="submit" style={{ backgroundColor: "rgb(18, 145, 18)" }} disabled={submitting}>
-            {submitting ? "Saving..." : "Accept"}
+          <button type="submit" style={{ backgroundColor: "rgb(18, 145, 18)" }}>
+            Accept
           </button>
         </div>
       </div>
     </form>
   )
 }
-
-

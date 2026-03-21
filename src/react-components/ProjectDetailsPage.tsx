@@ -2,7 +2,6 @@ import * as React from "react";
 import * as Router from "react-router-dom";
 import { ProjectsManager } from "../classes/ProjectsManager";
 import { ThreeViewer } from "./ThreeViewer";
-import { deleteDocument } from "../firebase";
 import { ProjectTasksList } from "./ProjectTasksList";
 
 interface Props {
@@ -11,25 +10,44 @@ interface Props {
 
 export function ProjectDetailsPage(props: Props) {
   const routeParams = Router.useParams<{id: string}>()
+  const navigateTo = Router.useNavigate()
+
   if (!routeParams.id) {return (<p>Project ID is needed to see this page</p>)}
   const project = props.projectsManager.getProject(routeParams.id)
   if (!project) {return (<p>The project with ID {routeParams.id} wasn't found.</p>)}
 
-  const navigateTo = Router.useNavigate()
-  props.projectsManager.OnProjectDeleted = async (id) => {
-    await deleteDocument("/projects", id)
+  props.projectsManager.OnProjectDeleted = (_id) => {
     navigateTo("/")
   }
+
+  const handleDelete = () => {
+    if (window.confirm(`Are you sure you want to delete "${project.name}"?`)) {
+      props.projectsManager.deleteProject(project.id)
+    }
+  }
+
   const [showCreateToDo, setShowCreateToDo] = React.useState(false)
   const [toDoQuery, setToDoQuery] = React.useState("")
+
   return (
     <div className="page" id="project-details">
       <header>
-        <div>
-          <h2 data-project-info="name">{project.name}</h2>
-          <p style={{ color: "#969696" }}>{project.description}</p>
+        <div style={{ display: "flex", alignItems: "center", columnGap: 16 }}>
+          <button
+            className="btn-secondary"
+            onClick={() => navigateTo("/")}
+            title="Back to Projects"
+            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px" }}
+          >
+            <span className="material-icons-round" style={{ fontSize: 20 }}>arrow_back</span>
+            Back
+          </button>
+          <div>
+            <h2 data-project-info="name">{project.name}</h2>
+            <p style={{ color: "#969696" }}>{project.description}</p>
+          </div>
         </div>
-        <button onClick={() => props.projectsManager.deleteProject(project.id)} style={{backgroundColor: "red"}}>Delete Project</button>
+        <button onClick={handleDelete} style={{backgroundColor: "red"}}>Delete Project</button>
       </header>
       <div className="main-page-content">
         <div style={{ display: "flex", flexDirection: "column", rowGap: 30 }}>
@@ -72,27 +90,19 @@ export function ProjectDetailsPage(props: Props) {
                 }}
               >
                 <div>
-                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>
-                    Status
-                  </p>
+                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>Status</p>
                   <p>{project.status}</p>
                 </div>
                 <div>
-                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>
-                    Cost
-                  </p>
+                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>Cost</p>
                   <p>$ {project.cost}</p>
                 </div>
                 <div>
-                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>
-                    Role
-                  </p>
+                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>Role</p>
                   <p>{project.userRole}</p>
                 </div>
                 <div>
-                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>
-                    Finish Date
-                  </p>
+                  <p style={{ color: "#969696", fontSize: "var(--font-sm)" }}>Finish Date</p>
                   <p>{project.finishDate.toDateString()}</p>
                 </div>
               </div>
@@ -151,6 +161,7 @@ export function ProjectDetailsPage(props: Props) {
             </div>
             <ProjectTasksList
               projectId={project.id}
+              projectsManager={props.projectsManager}
               queryText={toDoQuery}
               showCreate={showCreateToDo}
               onRequestCloseCreate={() => setShowCreateToDo(false)}
