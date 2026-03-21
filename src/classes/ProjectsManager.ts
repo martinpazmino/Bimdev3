@@ -106,39 +106,56 @@ export class ProjectsManager {
     const input = document.createElement("input")
     input.type = "file"
     input.accept = "application/json"
+    input.style.display = "none"
+    document.body.appendChild(input)
+
     const reader = new FileReader()
     reader.addEventListener("load", () => {
+      document.body.removeChild(input)
       const json = reader.result
       if (!json) { return }
-      const projects: any[] = JSON.parse(json as string)
-      for (const p of projects) {
-        const iProject: IProject = {
-          name: p.name,
-          description: p.description,
-          status: p.status,
-          userRole: p.userRole,
-          finishDate: new Date(p.finishDate),
-          cost: p.cost,
-          progress: p.progress,
-          todos: p.todos ?? [],
+      try {
+        const projects: any[] = JSON.parse(json as string)
+        for (const p of projects) {
+          const iProject: IProject = {
+            name: p.name,
+            description: p.description,
+            status: p.status,
+            userRole: p.userRole,
+            finishDate: new Date(p.finishDate),
+            cost: p.cost,
+            progress: p.progress,
+            todos: p.todos ?? [],
+          }
+          const existing = this.getProjectByName(p.name)
+          if (existing) {
+            this.updateProject(existing.id, { ...iProject })
+          } else {
+            try {
+              this.newProject(iProject, p.id)
+            } catch (_) {}
+          }
         }
-        const existing = this.getProjectByName(p.name)
-        if (existing) {
-          // Update existing project (including todos)
-          this.updateProject(existing.id, { ...iProject })
+        // Always trigger a UI refresh after import
+        if (this.list.length > 0) {
+          this.OnProjectCreated(this.list[0])
         } else {
-          try {
-            this.newProject(iProject, p.id)
-          } catch (_) {}
+          this.OnProjectDeleted("")
         }
+      } catch (e) {
+        alert("Error reading JSON file: " + e)
       }
-      this.OnProjectCreated(this.list[0]) // trigger UI refresh
     })
+
     input.addEventListener("change", () => {
       const filesList = input.files
-      if (!filesList) { return }
+      if (!filesList || filesList.length === 0) {
+        document.body.removeChild(input)
+        return
+      }
       reader.readAsText(filesList[0])
     })
+
     input.click()
   }
 }

@@ -91,9 +91,10 @@ export function ProjectTasksList(props: Props) {
           }}
           style={{
             marginTop: 16,
-            display: "grid",
-            gap: 10,
-            gridTemplateColumns: "1fr 1fr 1fr 1fr 120px auto"
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            alignItems: "center"
           }}
         >
           <input
@@ -101,7 +102,7 @@ export function ProjectTasksList(props: Props) {
             placeholder="Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            style={{ gridColumn: "span 2" }}
+            style={{ flex: "1 1 120px", minWidth: 0 }}
             required
           />
           <input
@@ -109,15 +110,15 @@ export function ProjectTasksList(props: Props) {
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            style={{ gridColumn: "span 2" }}
+            style={{ flex: "2 1 140px", minWidth: 0 }}
             required
           />
-          <select value={priority} onChange={(e) => setPriority(e.target.value as ToDoModel["priority"]) }>
+          <select value={priority} onChange={(e) => setPriority(e.target.value as ToDoModel["priority"])} style={{ flex: "0 1 90px" }}>
             <option value="Low">Low</option>
             <option value="Medium">Medium</option>
             <option value="High">High</option>
           </select>
-          <select value={status} onChange={(e) => setStatus(e.target.value as ToDoModel["status"]) }>
+          <select value={status} onChange={(e) => setStatus(e.target.value as ToDoModel["status"])} style={{ flex: "0 1 110px" }}>
             <option value="Pending">Pending</option>
             <option value="In Progress">In Progress</option>
             <option value="Done">Done</option>
@@ -128,10 +129,11 @@ export function ProjectTasksList(props: Props) {
             max={100}
             value={progress}
             onChange={(e) => setProgress(Number(e.target.value))}
-            placeholder="Progress %"
+            placeholder="%"
+            style={{ flex: "0 1 60px", minWidth: 0 }}
           />
-          <button type="submit" style={{ backgroundColor: "rgb(18, 145, 18)" }}>
-            <span className="material-icons-round">add</span>
+          <button type="submit" style={{ backgroundColor: "rgb(18, 145, 18)", padding: "6px 10px", flexShrink: 0 }}>
+            <span className="material-icons-round" style={{ fontSize: 18 }}>add</span>
           </button>
         </form>
       )}
@@ -166,9 +168,10 @@ function EditableToDoCard(props: { todo: ToDoModel; onSave: (updates: Partial<To
         setIsEditing(false)
       }}
       style={{
-        display: "grid",
-        gap: 10,
-        gridTemplateColumns: "1fr 1fr 140px 160px 120px auto auto",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: 8,
+        alignItems: "center",
         background: "var(--background-100)",
         padding: 12,
         borderRadius: 8
@@ -179,6 +182,7 @@ function EditableToDoCard(props: { todo: ToDoModel; onSave: (updates: Partial<To
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Title"
+        style={{ flex: "1 1 120px", minWidth: 0 }}
         required
       />
       <input
@@ -186,14 +190,15 @@ function EditableToDoCard(props: { todo: ToDoModel; onSave: (updates: Partial<To
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Description"
+        style={{ flex: "2 1 140px", minWidth: 0 }}
         required
       />
-      <select value={priority} onChange={(e) => setPriority(e.target.value as ToDoModel["priority"]) }>
+      <select value={priority} onChange={(e) => setPriority(e.target.value as ToDoModel["priority"])} style={{ flex: "0 1 90px" }}>
         <option value="Low">Low</option>
         <option value="Medium">Medium</option>
         <option value="High">High</option>
       </select>
-      <select value={status} onChange={(e) => setStatus(e.target.value as ToDoModel["status"]) }>
+      <select value={status} onChange={(e) => setStatus(e.target.value as ToDoModel["status"])} style={{ flex: "0 1 110px" }}>
         <option value="Pending">Pending</option>
         <option value="In Progress">In Progress</option>
         <option value="Done">Done</option>
@@ -204,10 +209,16 @@ function EditableToDoCard(props: { todo: ToDoModel; onSave: (updates: Partial<To
         max={100}
         value={progress}
         onChange={(e) => setProgress(Number(e.target.value))}
-        placeholder="Progress %"
+        placeholder="%"
+        style={{ flex: "0 1 60px", minWidth: 0 }}
       />
-      <button type="button" className="btn-secondary" onClick={() => setIsEditing(false)}>Cancel</button>
-      <button type="submit" style={{ backgroundColor: "rgb(18, 145, 18)" }}>Save</button>
+      <button type="button" className="btn-secondary" onClick={() => setIsEditing(false)} style={{ padding: "6px 10px", flexShrink: 0 }}>
+        <span className="material-icons-round" style={{ fontSize: 18 }}>close</span>
+      </button>
+      <button type="submit" style={{ backgroundColor: "rgb(18, 145, 18)", padding: "6px 10px", flexShrink: 0 }}>
+        <span className="material-icons-round" style={{ fontSize: 18 }}>check</span>
+      </button>
     </form>
   )
+
 }

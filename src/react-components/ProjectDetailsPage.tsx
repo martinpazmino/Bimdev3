@@ -3,6 +3,8 @@ import * as Router from "react-router-dom";
 import { ProjectsManager } from "../classes/ProjectsManager";
 import { ThreeViewer } from "./ThreeViewer";
 import { ProjectTasksList } from "./ProjectTasksList";
+import { ProjectForm } from "./ProjectForm";
+import { IProject } from "../classes/Project";
 
 interface Props {
   projectsManager: ProjectsManager
@@ -28,9 +30,35 @@ export function ProjectDetailsPage(props: Props) {
 
   const [showCreateToDo, setShowCreateToDo] = React.useState(false)
   const [toDoQuery, setToDoQuery] = React.useState("")
+  const [, forceUpdate] = React.useReducer(x => x + 1, 0)
+
+  const openEditModal = () => {
+    const modal = document.getElementById("edit-project-modal")
+    if (modal instanceof HTMLDialogElement) modal.showModal()
+  }
+
+  const closeEditModal = () => {
+    const modal = document.getElementById("edit-project-modal")
+    if (modal instanceof HTMLDialogElement) modal.close()
+  }
+
+  const handleEditSubmit = (result: { action: "create" | "update", id: string, data: IProject }) => {
+    props.projectsManager.updateProject(project.id, result.data)
+    closeEditModal()
+    forceUpdate() // re-render to show updated values
+  }
 
   return (
     <div className="page" id="project-details">
+      {/* Edit Project Modal */}
+      <dialog id="edit-project-modal">
+        <ProjectForm
+          project={{ ...project }}
+          onSubmit={handleEditSubmit}
+          onCancel={closeEditModal}
+        />
+      </dialog>
+
       <header>
         <div style={{ display: "flex", alignItems: "center", columnGap: 16 }}>
           <button
@@ -72,7 +100,7 @@ export function ProjectDetailsPage(props: Props) {
               >
                 HC
               </p>
-              <button className="btn-secondary">
+              <button className="btn-secondary" onClick={openEditModal}>
                 <p style={{ width: "100%" }}>Edit</p>
               </button>
             </div>
