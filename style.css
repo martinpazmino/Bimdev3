@@ -79,7 +79,9 @@ button:hover {
 .page {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
+  background-color: var(--background);
+  overflow-y: auto;
 }
 
 /* Sidebar styles */
@@ -286,4 +288,53 @@ input:focus, textarea:focus, select:focus {
   background-color: var(--background-100);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* Users page */
+
+#users-list {
+  display: grid;
+  padding: 20px 40px;
+  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.user-card {
+  background-color: var(--background-100);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.user-card:hover {
+  outline: 2px solid var(--primary);
+}
+
+.user-card-header {
+  display: flex;
+  column-gap: 15px;
+  padding: 20px;
+  align-items: center;
+  border-bottom: 2px solid #3b3c3f;
+}
+
+.user-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-status-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--background-100);
 }
