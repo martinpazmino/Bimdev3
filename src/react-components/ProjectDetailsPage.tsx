@@ -95,10 +95,11 @@ export function ProjectDetailsPage(props: Props) {
                   backgroundColor: "#ca8134",
                   aspectRatio: 1,
                   borderRadius: "100%",
-                  padding: 12
+                  padding: 12,
+                  textTransform: "uppercase"
                 }}
               >
-                HC
+                {project.name.slice(0, 2)}
               </p>
               <button className="btn-secondary" onClick={openEditModal}>
                 <p style={{ width: "100%" }}>Edit</p>

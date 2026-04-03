@@ -31,6 +31,10 @@ export function ProjectForm(props: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (name.length < 5) {
+      alert("Project name must be at least 5 characters long.")
+      return
+    }
     const data: IProject = {
       name,
       description,
